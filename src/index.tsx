@@ -11,11 +11,11 @@
 // // Types
 // type TodoType = {
 //     id: string;
-//     tile: string;
+//     title: string;
 //     order: number;
 //     createdAt: Date;
 //     updatedAt: Date;
-//     complete: boolean;
+//     completed: boolean;
 // }
 //
 //
@@ -35,7 +35,11 @@
 //     const [todos, setTodos] = useState<TodoType[]>([])
 //
 //     useEffect(() => {
-//         todosAPI.getTodos().then((res) => setTodos(res.data))
+//         todosAPI.getTodos()
+//             .then((res) => {
+//
+//             setTodos(res.data)
+//         })
 //     }, [])
 //
 //     return (
@@ -44,9 +48,9 @@
 //             {
 //                 todos.map((t) => {
 //                     return (
-//                         <div style={t.complete ? {color: 'grey'} : {}} key={t.id}>
-//                             <input type="checkbox" checked={t.complete}/>
-//                             <b>Описание</b>: {t.tile}
+//                         <div style={t.completed ? {color: 'grey'} : {}} key={t.id}>
+//                             <input type="checkbox" checked={t.completed}/>
+//                             <b>Описание</b>: {t.title}
 //                         </div>
 //                     )
 //                 })
@@ -64,7 +68,7 @@
 // // Напишите через пробел правильные свойства в TodoType, в которых была допущена ошибка.
 // // Debugger / network / документация вам в помощь
 //
-// // 🖥 Пример ответа: id status isDone  ////// createdAt updatedAt
+// // 🖥 Пример ответа: id status isDone  ////// title completed =================================
 
 
 
@@ -162,7 +166,7 @@
 //         const payload = {body: 'Это просто заглушка. Backend сам сгенерирует новый комментарий и вернет его вам'}
 //         // Promise.resolve() стоит в качестве заглушки, чтобы TS не ругался и код компилировался
 //         // Promise.resolve() нужно удалить и написать правильный запрос для создания нового комментария
-//         return instance.post<CommentType[]>('comments', {body: 'ksmdvoksmvoksmv'})
+//         return instance.post<CommentType[]>('comments', payload)
 //     }
 // }
 //
@@ -214,7 +218,7 @@
 // // Типизацию возвращаемых данных в ответе указывать необязательно, но можно и указать (в ответах учтены оба варианта).
 // // Исправленную версию строки напишите в качестве ответа.
 // //
-// // 🖥 Пример ответа: return Promise.resolve(payload) ////// return instance.post<CommentType[]>('comments', {body: 'ksmdvoksmvoksmv'}) --------
+// // 🖥 Пример ответа: return Promise.resolve(payload) ////// return instance.post<CommentType[]>('comments', payload) ===========
 
 
 
@@ -241,7 +245,7 @@
 //         return instance.get<PostType[]>('posts')
 //     },
 //     deletePost(id: string) {
-//         return axios.delete<{ message: string }>(`posts/${id}`)
+//         return instance.delete<{ message: string }>(`posts/${id}`)
 //     }
 // }
 //
@@ -292,7 +296,7 @@
 // // Почему не удаляется post при нажатии на кнопку удаления (х) ?
 // // Найдите ошибку и вставьте исправленную строку кода в качестве ответа
 // //
-// // 🖥 Пример ответа: return axios.delete   /////////??????????????????????????????
+// // 🖥 Пример ответа: return axios.delete   ///////// return instance.delete<{ message: string }>(`posts/${id}`) ====================
 
 
 
@@ -325,7 +329,7 @@
 //         return instance.get<PhotoType>(`photos/${photoId}`)
 //     },
 //     updatePhoto(payload: PayloadType) {
-//         return instance.put<PhotoType>(`photos/${photoId}`, {payload})
+//         return instance.put<PhotoType>(`photos/${photoId}`, payload)
 //     }
 // }
 //
@@ -382,7 +386,7 @@
 // // Найдите и исправьте ошибку
 // // Исправленную версию строки напишите в качестве ответа.
 //
-// // 🖥 Пример ответа: photosAPI.updatePhotoTitle(id, title)   /////???????????????????????????????????
+// // 🖥 Пример ответа: photosAPI.updatePhotoTitle(id, title)   ///// return instance.put<PhotoType>(`photos/${photoId}`, payload) ===========
 
 
 
@@ -404,7 +408,7 @@
 //
 // const api = {
 //     getUsers(pageNumber: number) {
-//         return instance.get(`users?pageSize=${3}&pageNumber${pageNumber}`)
+//         return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`)
 //     },
 // }
 //
@@ -467,7 +471,7 @@
 // // Однако в коде допущена ошибка и всегда подгружаются одни и теже пользователи.
 // // Задача: найти эту ошибку, и исправленную версию строки написать в качестве ответа.
 //
-// // 🖥 Пример ответа: const [currentPage, setCurrentPage] = useState(page) ////????????????????????????????
+// // 🖥 Пример ответа: const [currentPage, setCurrentPage] = useState(page) //// return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`) =====
 
 
 
@@ -568,28 +572,28 @@
 //     ratingImdb: number
 // }
 //
-// type ProductsResponseType = {
-//     total: number
-//     messages: string[]
-//     page: number
-//     pageCount: number
-//     data: ProductType[]
-// }
-//
-// type FilmsResponseType = {
-//     total: number
-//     messages: string[]
-//     page: number
-//     pageCount: number
-//     data: FilmType[]
-// }
+// // type ProductsResponseType = {
+// //     total: number
+// //     messages: string[]
+// //     page: number
+// //     pageCount: number
+// //     data: ProductType[]
+// // }
+// //
+// // type FilmsResponseType = {
+// //     total: number
+// //     messages: string[]
+// //     page: number
+// //     pageCount: number
+// //     data: FilmType[]
+// // }
 //
 // type CommonResponseType<T> = {
 //     total: number
 //     messages: string[]
 //     page: number
 //     pageCount: number
-//     data: T
+//     data: T[]
 // }
 //
 // // Api
@@ -597,10 +601,10 @@
 //
 // const api = {
 //     getProducts() {
-//         return instance.get<ProductsResponseType>('products')
+//         return instance.get<CommonResponseType<ProductType>>('products')
 //     },
 //     getFilms() {
-//         return instance.get<FilmsResponseType>('films')
+//         return instance.get<CommonResponseType<FilmType>>('films')
 //     }
 // }
 //
