@@ -1,23 +1,56 @@
-//
-// Экзамен #16
-// 🐢 Работа с сервером. Axios запросы
 
-//======================= Q1 ==================
 
-// import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
+
+// import React from 'react'
 // import ReactDOM from 'react-dom/client';
+//
+//
+// const thunkCreator = () => (XXX: any, YYY: any) => {
+//     // сode...
+// }
+//
+//
+// // App
+// const App = () => {
+//     return (
+//         <>
+//             <h1>В этом задании смотреть на экран не нужно. Ничего не изменится 😈</h1>
+//             <p>Читайте описание к заданию</p>
+//         </>
+//     )
+// }
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<App/>)
+
+// 📜 Описание:
+// Вместо XXX и YYY через пробел напишите параметры которые приходят в санку.
+//
+// 🖥 Пример ответа: useCallback state
+
+
+
+
+
+
+
+
+// import React, { useEffect } from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
+// import axios from 'axios';
 //
 // // Types
 // type TodoType = {
 //     id: string;
 //     title: string;
 //     order: number;
-//     createdAt: Date;
-//     updatedAt: Date;
+//     createdAt: string;
+//     updatedAt: string;
 //     completed: boolean;
 // }
-//
 //
 // // Api
 // const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
@@ -26,57 +59,226 @@
 //     getTodos() {
 //         return instance.get<TodoType[]>('todos')
 //     },
+//     changeTodoStatus(id: string, completed: boolean) {
+//         return instance.put(`todos/${id}`, {completed})
+//     }
 // }
 //
 //
-// // Appa
-// const Appa = () => {
+// // Reducer
+// const initState = [] as TodoType[]
 //
-//     const [todos, setTodos] = useState<TodoType[]>([])
+// type InitStateType = typeof initState
+//
+// const todosReducer = (state: InitStateType = initState, action: ActionsType) => {
+//     switch (action.type) {
+//         case 'TODOS/GET-TODOS':
+//             return action.todos
+//
+//         case 'TODOS/CHANGE-TODO-STATUS':
+//             return state.map((t) => {
+//                 if (t.id === action.todo.id) {
+//                     return {...t, completed: action.todo.completed}
+//                 } else {
+//                     return t
+//                 }
+//             })
+//
+//         default:
+//             return state
+//     }
+// }
+//
+// const getTodosAC = (todos: TodoType[]) => ({type: 'TODOS/GET-TODOS', todos} as const)
+// const changeTodoStatusAC = (todo: TodoType) => ({type: 'TODOS/CHANGE-TODO-STATUS', todo} as const)
+// type ActionsType = ReturnType<typeof getTodosAC> | ReturnType<typeof changeTodoStatusAC>
+//
+// // Thunk
+// const getTodosTC = (): AppThunk => (dispatch) => {
+//     todosAPI.getTodos()
+//         .then((res) => {
+//             dispatch(getTodosAC(res.data))
+//         })
+// }
+//
+// const changeTodoStatusTC = (id: string, completed: boolean): AppThunk => (dispatch) => {
+//     todosAPI.changeTodoStatus(id, completed)
+//         .then((res) => {
+//             dispatch(changeTodoStatusAC(res.data))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     todos: todosReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+// // Appa
+// const App = () => {
+//     const dispatch = useAppDispatch()
+//     const todos = useAppSelector(state => state.todos)
 //
 //     useEffect(() => {
-//         todosAPI.getTodos()
-//             .then((res) => {
-//
-//             setTodos(res.data)
-//         })
+//         dispatch(getTodosTC())    ///////////////////////////+++++++++++++++++++++++
 //     }, [])
+//
+//     const changeStatusHandler = (id: string, completed: boolean) => {
+//         dispatch(changeTodoStatusTC(id, completed))
+//     };
 //
 //     return (
 //         <>
 //             <h2>✅ Список тудулистов</h2>
 //             {
-//                 todos.map((t) => {
-//                     return (
-//                         <div style={t.completed ? {color: 'grey'} : {}} key={t.id}>
-//                             <input type="checkbox" checked={t.completed}/>
-//                             <b>Описание</b>: {t.title}
-//                         </div>
-//                     )
-//                 })
+//                 todos.length ?
+//                     todos.map((t) => {
+//                         return (
+//                             <div style={t.completed ? {color: 'grey'} : {}} key={t.id}>
+//                                 <input type="checkbox"
+//                                        checked={t.completed}
+//                                        onChange={() => changeStatusHandler(t.id, !t.completed)}
+//                                 />
+//                                 <b>Описание</b>: {t.title}
+//                             </div>
+//                         )
+//                     })
+//                     : <h2>Тудулистов нету 😥</h2>
 //             }
+//         </>
+//     )
+// }
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <App/></Provider>)
+
+// // 📜 Описание:
+// // При загрузке приложения вы должны увидеть список тудулистов,
+// // но из-за невнимательности была допущена ошибка.
+// // Найдите и исправьте ошибку.
+// // Исправленную версию строки напишите в качестве ответа.
+//
+// // 🖥 Пример ответа: type InitStateType = typeof initState
+
+
+
+// import React from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios from 'axios';
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
+//
+// // Types
+// type PhotoType = {
+//     albumId: string
+//     id: string
+//     title: string
+//     url: string
+// }
+//
+// // Api
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const photosAPI = {
+//     getPhotos() {
+//         return instance.get<PhotoType[]>('photos')
+//     },
+// }
+//
+//
+// // Reducer
+// const initState = [] as PhotoType[]
+//
+// type InitStateType = typeof initState
+//
+// const photoReducer = (state: InitStateType = initState, action: ActionsType) => {
+//     switch (action.type) {
+//         case 'PHOTO/GET-PHOTOS':
+//             return action.photos
+//         default:
+//             return state
+//     }
+// }
+//
+// const getPhotosAC = (photos: PhotoType[]) => ({type: 'PHOTO/GET-PHOTOS', photos} as const)
+// type ActionsType = ReturnType<typeof getPhotosAC>
+//
+// const getPhotosTC = (): AppThunk => (dispatch) => {
+//     photosAPI.getPhotos()
+//         .then((res) => {
+//             dispatch(getPhotosAC(res.data))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     photo: photoReducer,
+// })
+//
+// const store = createStore(rootReducer)
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Components
+// const Appa = () => {
+//     const dispatch = useAppDispatch()
+//     const photos = useAppSelector(state => state.photo)
+//
+//     const getPhotosHandler = () => {
+//         dispatch(getPhotosTC())
+//     };
+//
+//     return (
+//         <>
+//             <h1>📸 Фото</h1>
+//             <button onClick={getPhotosHandler}>Подгрузить фотографии</button>
+//             <div style={{display: 'flex', gap: '20px', margin: '20px'}}>{
+//                 photos.map(p => {
+//                     return <div key={p.id}>
+//                         <b>title</b>: {p.title}
+//                         <div><img src={p.url} alt=""/></div>
+//                     </div>
+//                 })
+//             }</div>
 //         </>
 //     )
 // }
 //
 //
 // const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
+// root.render(<Provider store={store}> <Appa/></Provider>)
 //
 // // 📜 Описание:
-// // При написании типизации по невнимательности было допущено несколько ошибок.
-// // Напишите через пробел правильные свойства в TodoType, в которых была допущена ошибка.
-// // Debugger / network / документация вам в помощь
+// // При нажатии на кнопку "Подгрузить фотографии" вы должны увидеть список фотографий,
+// // но ничего не подгружается.
+// // Найдите и исправьте ошибку.
+// // Debugger / network / console.log вам в помощь.
+// // Исправленную версию строки напишите в качестве ответа.
 //
-// // 🖥 Пример ответа: id status isDone  ////// title completed =================================
-
-
-
-//======================= Q2 ==================
-
-// import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
+// // 🖥 Пример ответа: type InitStateType = typeof initState
+//
+//
+//
+//
+//
+//
+// import React, { useEffect } from 'react'
 // import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios from 'axios';
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
 //
 // // Types
 // type PostType = {
@@ -86,33 +288,59 @@
 //     userId: string
 // }
 //
-//
 // // Api
 // const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
 //
 // const postsAPI = {
 //     getPosts() {
-//         // Promise.resolve() стоит в качестве заглушки, чтобы TS не ругался и код компилировался
-//         // Promise.resolve() нужно удалить и написать правильный запрос для получения постов
-//         // return Promise.resolve()
-//        return instance.get('posts')
+//         return instance.get<PostType[]>('posts')
 //     },
 // }
 //
 //
-// // Appa
-// export const Appa = () => {
+// // Reducer
+// const initState = [] as PostType[]
 //
-//     const [posts, setPosts] = useState<PostType[]>([])
+// type InitStateType = typeof initState
+//
+// const postsReducer = (state: InitStateType = initState, action: GetPostsActionType): InitStateType => {
+//     switch (action.type) {
+//         case 'POSTS/GET-POSTS':
+//             return action.posts
+//     }
+//     return state
+// }
+//
+// const getPostsAC = (posts: PostType[]) => ({type: 'POSTS/GET-POSTS', posts} as const)
+// type GetPostsActionType = ReturnType<typeof getPostsAC>
+//
+// const getPostsTC = (): AppThunk => (dispatch) => {
+//     postsAPI.getPosts()
+//         .then((res) => {
+//             dispatch(getPostsAC(res.data))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     posts: postsReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, GetPostsActionType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, GetPostsActionType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+// // Appa
+// const Appa = () => {
+//     const dispatch = useAppDispatch()
+//     const posts = useAppSelector(state => state.posts)
 //
 //     useEffect(() => {
-//         postsAPI.getPosts()
-//             .then((res: any) => {
-//
-//                 setPosts(res.data)
-//             })
+//         dispatch(getPostsTC)
 //     }, [])
-//
 //
 //     return (
 //         <>
@@ -128,23 +356,29 @@
 //     )
 // }
 //
-//
 // const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
+// root.render(<Provider store={store}> <Appa/></Provider>)
 //
 // // 📜 Описание:
-// // Напишите запрос на сервер для получения всех постов
-// // Типизацию возвращаемых данных в ответе указывать необязательно, но можно и указать (в ответах учтены оба варианта).
-// // Исправленную версию строки напишите в качестве ответа.
+// // При загрузке приложения вы должны увидеть список постов,
+// // но из-за невнимательности была допущена ошибка.
 //
-// // 🖥 Пример ответа: return Promise.resolve() //////return instance.get('posts')  +++++++
-
-
-//======================= Q3 ==================
-
-// import axios from 'axios'
-// import React, { ChangeEvent, useEffect, useState } from 'react'
+// // Найдите и исправьте ошибку
+// // Исправленную версию строки напишите в качестве ответа.
+// // 🖥 Пример ответа: type InitStateType = typeof initState
+//
+// // P.S. Эта ошибка из реальной жизни, студенты так часто ошибаются и не могут понять в чем дело.
+//
+//
+//
+//
+// import React, { useEffect } from 'react'
 // import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios from 'axios';
+//
 //
 // // Types
 // type CommentType = {
@@ -163,44 +397,178 @@
 //         return instance.get<CommentType[]>('comments')
 //     },
 //     createComment() {
-//         const payload = {body: 'Это просто заглушка. Backend сам сгенерирует новый комментарий и вернет его вам'}
-//         // Promise.resolve() стоит в качестве заглушки, чтобы TS не ругался и код компилировался
-//         // Promise.resolve() нужно удалить и написать правильный запрос для создания нового комментария
-//         return instance.post<CommentType[]>('comments', payload)
+//         const payload = {
+//             body: 'Это просто заглушка. Backend сам сгенерирует новый комментарий и вернет его вам',
+//         }
+//         return instance.post('comments', payload)
+//     }
+// }
+//
+// // Reducer
+// const initState = [] as CommentType[]
+//
+// type InitStateType = typeof initState
+//
+// const commentsReducer = (state: InitStateType = initState, action: ActionsType) => {
+//     switch (action.type) {
+//         case 'COMMENTS/GET-COMMENTS':
+//             return action.comments
+//         case 'COMMENTS/CREATE-COMMENT':
+//             return [action.comment, ...state]
+//         default:
+//             return state
 //     }
 // }
 //
 //
-// // Appa
-// export const Appa = () => {
+// const getCommentsAC = (comments: CommentType[]) => ({type: 'COMMENTS/GET-COMMENTS', comments} as const)
+// const createCommentAC = (comment: CommentType) => ({type: 'COMMENTS/CREATE-COMMENT', comment} as const)
 //
-//     const [comments, setComments] = useState<CommentType[]>([])
+// type ActionsType = ReturnType<typeof getCommentsAC> | ReturnType<typeof createCommentAC>
+//
+// const getCommentsTC = (): AppThunk => (dispatch) => {
+//     commentsAPI.getComments()
+//         .then((res) => {
+//             dispatch(getCommentsAC(res.data))
+//         })
+// }
+//
+// const addCommentTC = (): AppThunk => (dispatch) => {
+//     commentsAPI.createComment()
+//         .then((res) => {
+//             dispatch(createCommentAC(res.data))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     comments: commentsReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Appa
+// const Appa = () => {
+//     const dispatch = useAppDispatch()
+//     const comments = useAppSelector(state => state.comments)
 //
 //     useEffect(() => {
-//         commentsAPI.getComments()
-//             .then((res) => {
-//                 setComments(res.data)
-//             })
+//         dispatch(getCommentsTC())
 //     }, [])
 //
-//     const createPostHandler = () => {
-//         commentsAPI.createComment()
-//             .then((res: any) => {
-//                 const newComment = res.data
-//                 setComments([newComment, ...comments,])
-//             })
+//     const addCommentHandler = () => {
+//         alert('Комментарий добавить не получилось. Напишите код самостоятельно 🚀')
 //     };
 //
 //     return (
 //         <>
 //             <h1>📝 Список комментариев</h1>
-//             <div style={{marginBottom: '15px'}}>
-//                 <button style={{marginLeft: '15px'}}
-//                         onClick={() => createPostHandler()}>
-//                     Добавить новый комментарий
-//                 </button>
-//             </div>
+//             <button style={{marginBottom: '10px'}}
+//                     onClick={addCommentHandler}>Добавить новый комментарий
+//             </button>
+//             {
+//                 comments.map(p => {
+//                     return <div key={p.id}><b>описание</b>: {p.body}</div>
+//                 })
+//             }
+//         </>
+//     )
+// }
 //
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
+// // 📜 Описание:
+// // При нажатии на кнопку "Добавить новый комментарий" комментарий должен добавиться,
+// // но появляется alert.
+// // Вместо alerta напишите код, чтобы комментарий добавлялся.
+// // Правильную версию строки напишите в качестве ответа.
+// // 🖥 Пример ответа: return instance.get<CommentType[]>('comments?_limit=10')
+//
+//
+//
+//
+//
+// import axios from 'axios'
+// import React, { useEffect } from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux';
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
+//
+// // Types
+// type CommentType = {
+//     postId: string
+//     id: string
+//     name: string
+//     email: string
+//     body: string
+// }
+//
+// // Api
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const commentsAPI = {
+//     getComments() {
+//         return instance.get<CommentType[]>('comments')
+//     }
+// }
+//
+// // Reducer
+// const initState = [] as CommentType[]
+//
+// type InitStateType = typeof initState
+//
+// const commentsReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'COMMENTS/GET-COMMENTS':
+//             return action.comments
+//         default:
+//             return state
+//     }
+// }
+//
+// const getCommentsAC = (comments: CommentType[]) => ({type: 'COMMENTS/GET-COMMENTS', comments} as const)
+// type ActionsType = ReturnType<typeof getCommentsAC>
+//
+// const getCommentsTC = (): ThunkAction<any, any, any, any> => (dispatch) => {
+//     commentsAPI.getComments()
+//         .then((res) => {
+//             dispatch(getCommentsAC(res.data))
+//         })
+// }
+//
+//
+// // Store
+// const rootReducer = combineReducers({
+//     comments: commentsReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+// // Appa
+// export const Appa = () => {
+//
+//     const comments = useAppSelector(state => state.comments)
+//     const dispatch = useAppDispatch()
+//
+//     useEffect(() => {
+//         dispatch(getCommentsTC())
+//     }, [])
+//
+//     return (
+//         <>
+//             <h1>📝 Список комментариев</h1>
 //             {
 //                 comments.map(c => {
 //                     return <div key={c.id}><b>Comment</b>: {c.body} </div>
@@ -210,25 +578,392 @@
 //     )
 // }
 //
+//
 // const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
+// root.render(<Provider store={store}> <Appa/></Provider>)
 //
 // // 📜 Описание:
-// // Напишите запрос на сервер для создания нового комментария.
-// // Типизацию возвращаемых данных в ответе указывать необязательно, но можно и указать (в ответах учтены оба варианта).
-// // Исправленную версию строки напишите в качестве ответа.
-// //
-// // 🖥 Пример ответа: return Promise.resolve(payload) ////// return instance.post<CommentType[]>('comments', payload) ===========-----------
-
-
-
-//======================= Q4 ==================
-
+// // Ваша задача стоит в том чтобы правильно передать нужные типы в дженериковый тип ThunkAction<any, any, any, any>.
+// // Что нужно написать вместо any, any, any, any чтобы правильно типизировать thunk creator?
+// // Ответ дайте через пробел
+//
+// // 🖥 Пример ответа: unknown status isDone void
+//
+//
+//
+//
 // import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
+// import React, { useEffect } from 'react'
 // import ReactDOM from 'react-dom/client';
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux';
+// import thunk, { ThunkDispatch } from 'redux-thunk';
 //
 // // Types
+// type CommentType = {
+//     postId: string
+//     id: string
+//     name: string
+//     email: string
+//     body: string
+// }
+//
+// // Api
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const commentsAPI = {
+//     getComments() {
+//         return instance.get<CommentType[]>('comments')
+//     }
+// }
+//
+// // Reducer
+// const initState = [] as CommentType[]
+//
+// type InitStateType = typeof initState
+//
+// const commentsReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'COMMENTS/GET-COMMENTS':
+//             return action.comments
+//         default:
+//             return state
+//     }
+// }
+//
+// const getCommentsAC = (comments: CommentType[]) => ({type: 'COMMENTS/GET-COMMENTS', comments} as const)
+// type ActionsType = ReturnType<typeof getCommentsAC>
+//
+// const getCommentsTC = () => (dispatch: DispatchType) => {
+//     commentsAPI.getComments()
+//         .then((res) => {
+//             dispatch(getCommentsAC(res.data))
+//         })
+// }
+//
+//
+// // Store
+// const rootReducer = combineReducers({
+//     comments: commentsReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof rootReducer>
+// type DispatchType = ThunkDispatch<any, any, any>
+// const useAppDispatch = () => useDispatch<DispatchType>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+// // Appa
+// export const Appa = () => {
+//
+//     const comments = useAppSelector(state => state.comments)
+//     const dispatch = useAppDispatch()
+//
+//     useEffect(() => {
+//         dispatch(getCommentsTC())
+//     }, [])
+//
+//     return (
+//         <>
+//             <h1>📝 Список комментариев</h1>
+//             {
+//                 comments.map(c => {
+//                     return <div key={c.id}><b>Comment</b>: {c.body} </div>
+//                 })
+//             }
+//         </>
+//     )
+// }
+//
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
+// // 📜 Описание:
+// // Ваша задача стоит в том чтобы правильно передать нужные типы в дженериковый тип ThunkDispatch<any, any, any>.
+// // Что нужно написать вместо any, any, any чтобы правильно типизировать dispatch ?
+// // Ответ дайте через пробел
+//
+// // 🖥 Пример ответа: unknown status isDone
+//
+//
+
+
+// import React, { useEffect } from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios from 'axios';
+//
+// // Types
+// type PostType = {
+//     body: string
+//     id: string
+//     title: string
+//     userId: string
+// }
+//
+// type PayloadType = {
+//     title: string
+//     body?: string
+// }
+//
+//
+// // Api
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const postsAPI = {
+//     getPosts() {
+//         return instance.get<PostType[]>('posts')
+//     },
+//     updatePostTitle(postId: string, post: PayloadType) {
+//         return instance.put<PostType>(`posts/${postId}`, post)
+//     }
+// }
+//
+//
+// // Reducer
+// const initState = [] as PostType[]
+//
+// type InitStateType = typeof initState
+//
+// const postsReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'POSTS/GET-POSTS':
+//             return action.posts
+//
+//         case 'POSTS/UPDATE-POST-TITLE':
+//             return state.map((p) => {
+//                 if (p.id === action.post.id) {
+//                     return {...p, title: action.post.title}
+//                 } else {
+//                     return p
+//                 }
+//             })
+//
+//         default:
+//             return state
+//     }
+// }
+//
+// const getPostsAC = (posts: PostType[]) => ({type: 'POSTS/GET-POSTS', posts} as const)
+// const updatePostTitleAC = (post: PostType) => ({type: 'POSTS/UPDATE-POST-TITLE', post} as const)
+// type ActionsType = ReturnType<typeof getPostsAC> | ReturnType<typeof updatePostTitleAC>
+//
+// const getPostsTC = (): AppThunk => (dispatch) => {
+//     postsAPI.getPosts()
+//         .then((res) => {
+//             dispatch(getPostsAC(res.data))
+//         })
+// }
+//
+// const updatePostTC = (postId: string): AppThunk => (dispatch, getState: any) => {
+//     try {
+//         const currentPost = getState().find((p: PostType) => p.id === postId)
+//
+//         if (currentPost) {
+//             const payload = {title: 'Это просто заглушка. Backend сам сгенерирует новый title'}
+//             postsAPI.updatePostTitle(postId, payload)
+//                 .then((res) => {
+//                     dispatch(updatePostTitleAC(res.data))
+//                 })
+//         }
+//     } catch (e) {
+//         alert('Обновить пост не удалось 😢')
+//     }
+//
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     posts: postsReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+// // Appa
+// export const Appa = () => {
+//     const dispatch = useAppDispatch()
+//     const posts = useAppSelector(state => state.posts)
+//
+//     useEffect(() => {
+//         dispatch(getPostsTC())
+//     }, [])
+//
+//     const updatePostHandler = (postId: string) => {
+//         dispatch(updatePostTC(postId))
+//     }
+//
+//     return (
+//         <>
+//             <h1>📜 Список постов</h1>
+//             {
+//                 posts.map(p => {
+//                     return <div key={p.id}>
+//                         <b>title</b>: {p.title}
+//                         <button onClick={() => updatePostHandler(p.id)}>Обновить пост</button>
+//                     </div>
+//                 })
+//             }
+//         </>
+//     )
+// }
+//
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
+// // 📜 Описание:
+// // Попробуйте обновить пост и вы увидите alert с ошибкой.
+// // Debugger / network / console.log вам в помощь
+// // Найдите ошибку и вставьте исправленную строку кода в качестве ответа.
+//
+// // 🖥 Пример ответа: const payload = {...currentPost, tile: 'Летим 🚀'}
+
+
+
+
+//++++++++++++++++++++++++++++=======================================++++++++++++++++++++++++++++
+
+// import React from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios from 'axios';
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
+//
+// // Types
+// type PhotoType = {
+//     albumId: string
+//     id: string
+//     title: string
+//     url: string
+// }
+//
+// // Api
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const photosAPI = {
+//     getPhotos() {
+//         return instance.get<PhotoType[]>('photos?delay=2')
+//     },
+// }
+//
+//
+// // Reducer
+// const initState = {
+//     isLoading: false,
+//     photos: [] as PhotoType[]
+// }
+//
+// type InitStateType = typeof initState
+//
+// const photoReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'PHOTO/GET-PHOTOS':
+//             return {...state, photos: action.photos}
+//         case 'PHOTO/IS-LOADING':
+//             return {...state, isLoading: action.isLoading}
+//         default:
+//             return state
+//     }
+// }
+//
+// const getPhotosAC = (photos: PhotoType[]) => ({type: 'PHOTO/GET-PHOTOS', photos} as const)
+// const setLoadingAC = (isLoading: boolean) => ({type: 'PHOTO/IS-LOADING', isLoading} as const)
+// type ActionsType = ReturnType<typeof getPhotosAC> | ReturnType<typeof setLoadingAC>
+//
+// const getPhotosTC = (): AppThunk => (dispatch) => {
+//     dispatch(setLoadingAC(true))
+//     photosAPI.getPhotos()
+//         .then((res) => {
+//             dispatch(getPhotosAC(res.data))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     photo: photoReducer
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Loader
+// export const Loader = () => {
+//     return (
+//         <h1>Loading ...</h1>
+//     )
+// }
+//
+// // Appa
+// const Appa = () => {
+//     const dispatch = useAppDispatch()
+//     const photos = useAppSelector(state => state.photo.photos)
+//     const isLoading = useAppSelector(state => state.photo.isLoading)
+//
+//     const getPhotosHandler = () => {
+//         dispatch(getPhotosTC())
+//     };
+//
+//     return (
+//         <>
+//             <h1>📸 Фото</h1>
+//             <button onClick={getPhotosHandler}>Подгрузить фотографии</button>
+//             {isLoading && <Loader/>}
+//             <div style={{display: 'flex', gap: '20px', margin: '20px'}}>{
+//                 photos.map(p => {
+//                     return <div key={p.id}>
+//                         <b>title</b>: {p.title}
+//                         <div><img src={p.url} alt=""/></div>
+//                     </div>
+//                 })
+//             }</div>
+//         </>
+//     )
+// }
+//
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
+// // 📜 Описание:
+// // При нажатии на кнопку "Подгрузить фотографии" вы должны увидеть Loading...,
+// // и через 3 секунды непосредственно фотографии.
+// // Но после подгрузки данных Loader не убирается.
+// // Какой код нужно написать, чтобы Loader перестал отображаться после получения данных
+// // В качестве ответа напишите строку кода.
+//
+// // 🖥 Пример ответа: console.log('stop Loader')
+
+
+
+
+//
+// import React, { useEffect } from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
+// import axios from 'axios';
+//
+//
+// // Types
+// type PostDomainType = PostType & {
+//     isDisabled: boolean
+// }
+//
 // type PostType = {
 //     body: string
 //     id: string
@@ -245,66 +980,545 @@
 //         return instance.get<PostType[]>('posts')
 //     },
 //     deletePost(id: string) {
-//         return instance.delete<{ message: string }>(`posts/${id}`)
+//         return instance.delete<{ message: string }>(`posts/${id}?delay=3`)
 //     }
 // }
 //
 //
-// // Appa
-// export const Appa = () => {
+// // Reducer
+// const initState = {
+//     isLoading: false,
+//     posts: [] as PostDomainType[]
+// }
 //
-//     const [posts, setPosts] = useState<PostType[]>([])
+// type InitStateType = typeof initState
+//
+// const postsReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'POSTS/GET-POSTS':
+//             return {
+//                 ...state, posts: action.posts.map(t => {
+//                     return {...t, isDisabled: false}
+//                 })
+//             }
+//
+//         case 'POSTS/DELETE-POST':
+//             return {...state, posts: state.posts.filter(t => t.id !== action.id)}
+//
+//         case 'POSTS/IS-LOADING':
+//             return {...state, isLoading: action.isLoading}
+//
+//         case 'POSTS/IS-DISABLED':
+//             return {
+//                 ...state, posts: state.posts.map((t) => {
+//                     if (t.id === action.id) {
+//                         return {...t, isDisabled: action.isDisabled}
+//                     } else {
+//                         return t
+//                     }
+//                 })
+//             }
+//
+//         default:
+//             return state
+//     }
+// }
+//
+// const getPostsAC = (posts: PostType[]) => ({type: 'POSTS/GET-POSTS', posts} as const)
+// const deletePostAC = (id: string) => ({type: 'POSTS/DELETE-POST', id} as const)
+// const setLoadingAC = (isLoading: boolean) => ({type: 'POSTS/IS-LOADING', isLoading} as const)
+// const setIsDisabled = (isDisabled: boolean, id: string) => ({type: 'POSTS/IS-DISABLED', isDisabled, id} as const)
+// type ActionsType =
+//     | ReturnType<typeof getPostsAC>
+//     | ReturnType<typeof deletePostAC>
+//     | ReturnType<typeof setLoadingAC>
+//     | ReturnType<typeof setIsDisabled>
+//
+// // Thunk
+// const getPostsTC = (): AppThunk => (dispatch) => {
+//     postsAPI.getPosts()
+//         .then((res) => {
+//             dispatch(getPostsAC(res.data))
+//         })
+// }
+//
+// const deletePostTC = (id: string): AppThunk => (dispatch) => {
+//     dispatch(setIsDisabled(true, id))
+//     dispatch(setLoadingAC(true))
+//     postsAPI.deletePost(id)
+//         .then((res) => {
+//             dispatch(deletePostAC(id))
+//             dispatch(setLoadingAC(false))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     posts: postsReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Loader
+// export const Loader = () => {
+//     return (
+//         <h1>Loading ...</h1>
+//     )
+// }
+//
+// // Appa
+// const Appa = () => {
+//     const dispatch = useAppDispatch()
+//     const posts = useAppSelector(state => state.posts.posts)
+//     const isLoading = useAppSelector(state => state.posts.isLoading)
 //
 //     useEffect(() => {
-//         postsAPI.getPosts()
-//             .then((res) => {
-//                 setPosts(res.data)
-//             })
+//         dispatch(getPostsTC())
 //     }, [])
 //
 //     const deletePostHandler = (id: string) => {
-//         postsAPI.deletePost(id)
-//             .then((res) => {
-//                 const newPostsArr = posts.filter(p => p.id !== id)
-//                 setPosts(newPostsArr)
-//             })
+//         dispatch(deletePostTC(id))
 //     };
+//
+//     return (
+//         <div>
+//             <div style={{position: 'absolute', top: '0px'}}>
+//                 {isLoading && <Loader/>}
+//             </div>
+//             <div style={{marginTop: '100px'}}>
+//                 <h1>📜 Список постов</h1>
+//                 {posts.map(p => {
+//                     return (
+//                         <div key={p.id}>
+//                             <b>title</b>: {p.title}
+//                             <button style={{marginLeft: '15px'}}
+//                                     onClick={() => deletePostHandler(p.id)}
+//                             >
+//                                 удалить пост
+//                             </button>
+//                         </div>
+//                     )
+//                 })}
+//             </div>
+//         </div>
+//     )
+// }
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
+// // 📜 Описание:
+// // Перед вами список постов.
+// // Откройте network и быстро нажмите на кнопку удалить пост несколько раз подряд.
+// // Откройте вкладку Preview и проанализируйте ответ с сервера
+// // Первое сообщение будет "Post has been successfully deleted",
+// // а следующие "Post with id: 63626ac315d01f80765587ee does not exist"
+// // Т.е. бэкенд первый раз удаляет, а потом уже не может, т.к. пост удален из базы данных.
+//
+// // Ваша задача при первом клике задизаблить кнопку удаления,
+// // соответсвенно не давать пользователю возможности слать повторные запросы
+// // Необходимую строку кода для решения этой задачи напишите в качестве ответа.
+//
+// // 🖥 Пример ответа: style={{marginRight: '20px'}}
+
+
+
+
+
+// import React, { useEffect } from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
+// import axios, { AxiosError } from 'axios';
+//
+//
+// // Types
+// type PostType = {
+//     id: string
+//     body: string
+//     title: string
+//     userId: string
+// }
+//
+// // Api
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/ '})
+//
+// const postsAPI = {
+//     getPosts() {
+//         return instance.get<PostType[]>('posts')
+//     },
+// }
+//
+// // Reducer
+// const initState = {
+//     error: null as string | null,
+//     posts: [] as PostType[]
+// }
+//
+// type InitStateType = typeof initState
+//
+// const appReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'POSTS/GET-POSTS':
+//             return {...state, posts: action.posts}
+//
+//         case 'POSTS/SET-ERROR':
+//             return {...state, error: action.error}
+//
+//         default:
+//             return state
+//     }
+// }
+//
+//
+// const getPostsAC = (posts: PostType[]) => ({type: 'POSTS/GET-POSTS', posts} as const)
+// const setErrorAC = (error: string | null) => ({type: 'POSTS/SET-ERROR', error} as const)
+// type ActionsType = ReturnType<typeof getPostsAC> | ReturnType<typeof setErrorAC>
+//
+// // Thunk
+// const getPostsTC = (): AppThunk => (dispatch) => {
+//     postsAPI.getPosts()
+//         .then((res) => {
+//             dispatch(getPostsAC(res.data))
+//         })
+//         .catch((e: AxiosError) => {
+//         })
+// }
+//
+//
+// // Store
+// const rootReducer = combineReducers({
+//     app: appReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Components
+// export const Appa = () => {
+//
+//     const dispatch = useAppDispatch()
+//
+//     const posts = useAppSelector(state => state.app.posts)
+//     const error = useAppSelector(state => state.app.error)
+//
+//     useEffect(() => {
+//         dispatch(getPostsTC())
+//     }, [])
 //
 //     return (
 //         <>
 //             <h1>📜 Список постов</h1>
-//             {posts.map(p => {
-//                 return (
-//                     <div key={p.id}>
-//                         <b>title</b>: {p.title}
-//                         <button style={{marginLeft: '15px'}}
-//                                 onClick={() => deletePostHandler(p.id)}>
-//                             x
-//                         </button>
-//                     </div>
-//                 )
-//             })}
+//             {
+//                 posts.length
+//                     ?
+//                     posts.map(c => {
+//                         return <div key={c.id}><b>Описание</b>: {c.body} </div>
+//                     })
+//                     :
+//                     <h3>❌ Посты не подгрузились. Произошла какая-то ошибка. Выведите сообщение об ошибке на экран</h3>
+//             }
+//             <h2 style={{color: 'red'}}>{!!error && error}</h2>
 //         </>
 //     )
 // }
 //
-//
 // const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
+// root.render(<Provider store={store}> <Appa/></Provider>)
 //
 // // 📜 Описание:
-// // Почему не удаляется post при нажатии на кнопку удаления (х) ?
-// // Найдите ошибку и вставьте исправленную строку кода в качестве ответа
-// //
-// // 🖥 Пример ответа: return axios.delete   ///////// return instance.delete<{ message: string }>(`posts/${id}`) ====================
+// // ❌ Посты не подгрузились. Произошла какая-то ошибка.
+// // Чинить приложение не нужно (если только для себя, в ответе это не учитывается).
+// // Задача: вывести сообщение об ошибке на экран.
+// // В качестве ответа указать строку коду, которая позволит это осуществить
+//
+// // 🖥 Пример ответа: const store = createStore(rootReducer, applyMiddleware(thunk))
 
 
 
-//======================= Q5 ==================
 
-// import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
+
+// import React, { useState } from 'react'
 // import ReactDOM from 'react-dom/client';
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+// import axios, { AxiosError } from 'axios';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux';
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
+//
+//
+// // Types
+// type NullableType<T> = null | T
+//
+// type LoginFieldsType = {
+//     email: string
+//     password: string
+// }
+//
+// // API
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const api = {
+//     login(data: LoginFieldsType) {
+//         return instance.post('auth/login', data)
+//     },
+// }
+//
+//
+// // Reducer
+// const initState = {
+//     isLoading: false,
+//     error: null as NullableType<string>,
+//     isLoggedIn: false,
+// }
+//
+// type InitStateType = typeof initState
+//
+// const appReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'APP/SET-IS-LOGGED-IN':
+//             return {...state, isLoggedIn: action.isLoggedIn}
+//         case 'APP/IS-LOADING':
+//             return {...state, isLoading: action.isLoading}
+//         case 'APP/SET-ERROR':
+//             return {...state, error: action.error}
+//         default:
+//             return state
+//     }
+// }
+//
+// // Actions
+// const setIsLoggedIn = (isLoggedIn: boolean) => ({type: 'APP/SET-IS-LOGGED-IN', isLoggedIn} as const)
+// const setLoadingAC = (isLoading: boolean) => ({type: 'APP/IS-LOADING', isLoading} as const)
+// const setError = (error: string | null) => ({type: 'APP/SET-ERROR', error} as const)
+// type ActionsType = | ReturnType<typeof setIsLoggedIn> | ReturnType<typeof setLoadingAC> | ReturnType<typeof setError>
+//
+// // Thunk
+// const loginTC = (values: LoginFieldsType): AppThunk => (dispatch) => {
+//     dispatch(setLoadingAC(true))
+//     api.login(values)
+//         .then((res) => {
+//             dispatch(setIsLoggedIn(true))
+//             alert('Вы залогинились успешно')
+//         })
+//         .catch((e) => {
+//         })
+//         .finally(() => {
+//             dispatch(setLoadingAC(false))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     app: appReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Loader
+// export const Loader = () => {
+//     return <h1>Loading ...</h1>
+// }
+//
+// // Appa
+// export const Appa = () => {
+//
+//     const dispatch = useAppDispatch()
+//
+//     const [form, setForm] = useState<LoginFieldsType>({email: '', password: ''})
+//
+//     const error = useAppSelector(state => state.app.error)
+//     const isLoading = useAppSelector(state => state.app.isLoading)
+//
+//     const changeFormValuesHandler = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+//         if (field === 'email') {
+//             setForm({...form, email: e.currentTarget.value})
+//         }
+//         if (field === 'password') {
+//             setForm({...form, password: e.currentTarget.value})
+//         }
+//     };
+//
+//     const submitForm = (e: React.MouseEvent<HTMLButtonElement>) => {
+//         e.preventDefault()
+//         dispatch(loginTC(form))
+//     };
+//
+//     return (
+//         <div>
+//             {!!error && <h2 style={{color: 'red'}}>{error}</h2>}
+//             {isLoading && <Loader/>}
+//             <form>
+//                 <div>
+//                     <input placeholder={'Введите email'}
+//                            value={form.email}
+//                            onChange={(e) => changeFormValuesHandler(e, 'email')}
+//                     />
+//                 </div>
+//                 <div>
+//                     <input type={'password'}
+//                            placeholder={'Введите пароль'}
+//                            value={form.password}
+//                            onChange={(e) => changeFormValuesHandler(e, 'password')}
+//                     />
+//                 </div>
+//                 <button type="submit" onClick={submitForm}>Залогиниться</button>
+//             </form>
+//         </div>
+//     );
+// }
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
+// // 📜 Описание:
+// // Перед вами форма логинизации. Введите любые логин и пароль и попробуйте залогиниться.
+// // У вас это навряд ли получится 😈, т.к. вы не знаете email и пароль.
+// // Откройте Network и проанализируйте запрос.
+// // Задача: вывести сообщение об ошибке, которую возвращает сервера говорящую о том что email или password некорректны.
+//
+// // В качестве ответа указать строку коду, которая позволит это осуществить.
+// // 🖥 Пример ответа: dispatch('Error message')
+// // ❗ Типизировать ошибку не надо, т.к. там есть много нюансов, о которых вы узнаете позже
+
+
+
+
+
+// import React, { useEffect } from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
+// import axios, { AxiosError } from 'axios';
+//
+//
+// // Types
+// type CommentType = {
+//     postId: string
+//     id: string
+//     name: string
+//     email: string
+//     body: string
+// }
+//
+// // Api
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const commentsAPI = {
+//     getComments() {
+//         return instance.get<CommentType[]>('comment')
+//     }
+// }
+//
+// // Reducer
+// const initState = {
+//     comments: [] as CommentType[]
+// }
+//
+// type InitStateType = typeof initState
+//
+// const appReducer = (state: InitStateType = initState, action: ActionsType) => {
+//     switch (action.type) {
+//         case 'COMMENTS/GET-COMMENTS':
+//             return {...state, comments: action.comments}
+//
+//         default:
+//             return state
+//     }
+// }
+//
+// const getCommentsAC = (comments: CommentType[]) => ({type: 'COMMENTS/GET-COMMENTS', comments} as const)
+// type ActionsType = ReturnType<typeof getCommentsAC>
+//
+// // Thunk
+// const getCommentsTC = (): AppThunk => (dispatch) => {
+//     commentsAPI.getComments()
+//         .then((res) => {
+//             dispatch(getCommentsAC(res.data))
+//         })
+//         .catch((e: AxiosError) => {
+//             alert(`Сообщение об ошибке: ${e.message}`)
+//         })
+// }
+//
+//
+// // Store
+// const rootReducer = combineReducers({
+//     app: appReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Components
+// export const Appa = () => {
+//
+//     const comments = useAppSelector(state => state.app.comments)
+//     const dispatch = useAppDispatch()
+//
+//     useEffect(() => {
+//         dispatch(getCommentsTC())
+//     }, [])
+//
+//     return (
+//         <>
+//             <h1>📝 Список комментариев</h1>
+//             {
+//                 comments.length
+//                     ?
+//                     comments.map(c => {
+//                         return <div key={c.id}><b>Comment</b>: {c.body} </div>
+//                     })
+//                     :
+//                     <h3>❌ Комментарии не подгрузились. Произошла какая-то ошибка. Найди и исправь ее</h3>
+//             }
+//         </>
+//     )
+// }
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
+// // 📜 Описание:
+// // ❌ Комментарии не подгрузились. Произошла какая-то ошибка.
+// // В данном задании вам нужно найти ошибку и починить приложение.
+// // Если сделаете все верно, то увидите комментарии.
+// // В качестве ответа указать исправленную строку коду
+//
+// // 🖥 Пример ответа: const store = createStore(rootReducer, applyMiddleware(thunk))
+
+
+
+
+// import React from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore } from 'redux'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios, { AxiosError } from 'axios';
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk';
 //
 // // Types
 // type PhotoType = {
@@ -314,62 +1528,104 @@
 //     url: string
 // }
 //
-// type PayloadType = {
-//     title: string
-//     url?: string
-// }
-//
 // // Api
 // const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
 //
-// const photoId = '637df6dc99fdc52af974a517'
-//
 // const photosAPI = {
-//     getPhoto() {
-//         return instance.get<PhotoType>(`photos/${photoId}`)
+//     getPhotos() {
+//         return instance.get<PhotoType[]>('pictures?delay=3')
 //     },
-//     updatePhoto(payload: PayloadType) {
-//         return instance.put<PhotoType>(`photos/${photoId}`, payload)
-//     }
 // }
 //
 //
+// // Reducer
+// const initState = {
+//     isLoading: false,
+//     error: null as string | null,
+//     photos: [] as PhotoType[]
+// }
+//
+// type InitStateType = typeof initState
+//
+// const appReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'PHOTO/GET-PHOTOS':
+//             return {...state, photos: action.photos}
+//         case 'PHOTO/IS-LOADING':
+//             return {...state, isLoading: action.isLoading}
+//         case 'PHOTO/SET-ERROR':
+//             return {...state, error: action.error}
+//         default:
+//             return state
+//     }
+// }
+//
+// const getPhotosAC = (photos: PhotoType[]) => ({type: 'PHOTO/GET-PHOTOS', photos} as const)
+// const setLoadingAC = (isLoading: boolean) => ({type: 'PHOTO/IS-LOADING', isLoading} as const)
+// const setError = (error: string | null) => ({type: 'PHOTO/SET-ERROR', error} as const)
+// type ActionsType =
+//     | ReturnType<typeof getPhotosAC>
+//     | ReturnType<typeof setLoadingAC>
+//     | ReturnType<typeof setError>
+//
+// const getPhotosTC = (): AppThunk => (dispatch) => {
+//     dispatch(setLoadingAC(true))
+//     photosAPI.getPhotos()
+//         .then((res) => {
+//             dispatch(getPhotosAC(res.data))
+//         })
+//         .catch((e: AxiosError) => {
+//             dispatch(setError(e.message))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     app: appReducer
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // Loader
+// export const Loader = () => {
+//     return (
+//         <h1>Loading ...</h1>
+//     )
+// }
+//
 // // Appa
-// export const Appa = () => {
+// const Appa = () => {
+//     const dispatch = useAppDispatch()
 //
-//     const [photo, setPhoto] = useState<PhotoType | null>(null)
+//     const photos = useAppSelector(state => state.app.photos)
+//     const isLoading = useAppSelector(state => state.app.isLoading)
+//     const error = useAppSelector(state => state.app.error)
 //
-//     useEffect(() => {
-//         photosAPI.getPhoto()
-//             .then((res) => {
-//                 setPhoto(res.data)
-//             })
-//     }, [])
-//
-//     const updatePhotoHandler = () => {
-//         // ❗ title и url указаны в качестве заглушки. Server сам сгенерирует новый title
-//         const payload = {
-//             title: 'Новый title',
-//             url: 'data:image/png;base64,iVBORw0FAKEADDRESSnwMZAABJRUrkJggg=='
-//         }
-//         photosAPI.updatePhoto(payload)
-//             .then((res) => {
-//                 setPhoto(res.data)
-//             })
+//     const getPhotosHandler = () => {
+//         dispatch(getPhotosTC())
 //     };
 //
 //     return (
 //         <>
 //             <h1>📸 Фото</h1>
-//             <div>
-//                 <div style={{marginBottom: '15px'}}>
-//                     <h1>title: {photo?.title}</h1>
-//                     <div><img src={photo?.url} alt=""/></div>
-//                 </div>
-//                 <button style={{marginLeft: '15px'}}
-//                         onClick={updatePhotoHandler}>
-//                     Изменить title
-//                 </button>
+//             <h2 style={{color: 'red'}}>{!!error && error}</h2>
+//             {isLoading && <Loader/>}
+//             <button onClick={getPhotosHandler}>Подгрузить фотографии</button>
+//             <div style={{display: 'flex', gap: '20px', margin: '20px'}}>
+//                 {
+//                     photos.map(p => {
+//                         return <div key={p.id}>
+//                             <b>title</b>: {p.title}
+//                             <div><img src={p.url} alt=""/></div>
+//                         </div>
+//                     })
+//                 }
 //             </div>
 //         </>
 //     )
@@ -377,112 +1633,30 @@
 //
 //
 // const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
 //
 // // 📜 Описание:
-// // При нажатии на кнопку "Изменить title" title должен обновиться,
-// // но из-за невнимательности была допущена ошибка и изменение не происходит
-// //
-// // Найдите и исправьте ошибку
-// // Исправленную версию строки напишите в качестве ответа.
+// // При нажатии на кнопку "Подгрузить фотографии" появляется Loading... и сообщение об ошибке.
+// // Ваша задача состоит в том, чтобы спрятать Loader независимо от того, как завершится запрос на сервер.
+// // Т.е. если ответ придет успешный - Loader убираем
+// //      если ответ придет с ошибкой - Loader тоже убираем.
+// // Напишите код, с помощью которого можно реализовать данную задачу
+// // В качестве ответа напишите строку кода.
 //
-// // 🖥 Пример ответа: photosAPI.updatePhotoTitle(id, title)   ///// return instance.put<PhotoType>(`photos/${photoId}`, payload) ===========
+// // 🖥 Пример ответа: .then(() =>  dispatch(getPhotosAC(res.data)))
 
 
 
-//======================= Q6 ==================
 
-
-// import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
-// import ReactDOM from 'react-dom/client'
-//
-// type UserType = {
-//     id: string;
-//     name: string;
-//     age: number;
-// }
-//
-// // API
-// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
-//
-// const api = {
-//     getUsers(pageNumber: number) {
-//         return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`)
-//     },
-// }
-//
-// // Appa
-// const buttons = [
-//     {id: 1, title: '1'},
-//     {id: 2, title: '2'},
-//     {id: 3, title: '3'},
-// ]
-//
-// export const Appa = () => {
-//
-//     const [users, setUsers] = useState<UserType[]>([])
-//     const [currentPage, setCurrentPage] = useState(1)
-//
-//     useEffect(() => {
-//         api.getUsers(currentPage)
-//             .then((res: any) => {
-//                 setUsers(res.data.items)
-//             })
-//     }, [currentPage])
-//
-//     const setPageHandler = (page: number) => {
-//         setCurrentPage(page)
-//     };
-//
-//     return (
-//         <>
-//             <h1>👪 Список пользователей</h1>
-//             {
-//                 users.map(u => {
-//                     return <div style={{marginBottom: '25px'}} key={u.id}>
-//                         <p><b>name</b>: {u.name}</p>
-//                         <p><b>age</b>: {u.age}</p>
-//                     </div>
-//                 })
-//             }
-//
-//             {
-//                 buttons.map(b => {
-//                     return (
-//                         <button key={b.id}
-//                                 style={b.id === currentPage ? {backgroundColor: 'lightblue'} : {}}
-//                                 onClick={() => setPageHandler(b.id)}>
-//                             {b.title}
-//                         </button>
-//                     )
-//                 })
-//             }
-//         </>
-//     )
-// }
-//
-//
-// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
-//
-// // 📜 Описание:
-// // При переходе по страницам должны подгружаться новые пользователи.
-// // Однако в коде допущена ошибка и всегда подгружаются одни и теже пользователи.
-// // Задача: найти эту ошибку, и исправленную версию строки написать в качестве ответа.
-//
-// // 🖥 Пример ответа: const [currentPage, setCurrentPage] = useState(page) //// return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`) =====
-
-
-
-//======================= Q7 ==================
-
-
-// import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
+// import React, { useEffect } from 'react'
 // import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, Dispatch, legacy_createStore as createStore } from 'redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios, { AxiosError } from 'axios'
 //
-// // Types
+// // TYPES
 // type TodoType = {
 //     id: string;
 //     title: string;
@@ -492,184 +1666,181 @@
 //     completed: boolean;
 // }
 //
+// type UserType = {
+//     id: string;
+//     name: string;
+//     age: number;
+// }
 //
-// // Api
+// type UsersResponseType = {
+//     items: UserType[]
+//     totalCount: number
+// }
+//
+// // API
 // const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
 //
-// const todosAPI = {
-//     getTodo(todoId: string) {
-//         return instance.get<TodoType>(`todos/${todoId}`)
+// const api = {
+//     getTodos() {
+//         return instance.get<TodoType[]>('todo')
+//     },
+//     getUsers() {
+//         return instance.get<UsersResponseType>('user')
+//     },
+// }
+//
+// // Reducer
+// const initState = {
+//     isLoading: false,
+//     error: null as string | null,
+//     todos: [] as TodoType[],
+//     users: [] as UserType[],
+// }
+//
+// type InitStateType = typeof initState
+//
+// const appReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'APP/GET-TODOS':
+//             return {...state, todos: action.todos}
+//         case 'APP/GET-USERS':
+//             return {...state, users: action.users}
+//         case 'APP/IS-LOADING':
+//             return {...state, isLoading: action.isLoading}
+//         case 'APP/SET-ERROR':
+//             return {...state, error: action.error}
+//         default:
+//             return state
 //     }
 // }
 //
+// const getUsersAC = (users: UserType[]) => ({type: 'APP/GET-USERS', users} as const)
+// const getTodosAC = (todos: TodoType[]) => ({type: 'APP/GET-TODOS', todos} as const)
+// const setLoadingAC = (isLoading: boolean) => ({type: 'APP/IS-LOADING', isLoading} as const)
+// const setError = (error: string | null) => ({type: 'APP/SET-ERROR', error} as const)
 //
-// // Appa
-// export const Appa = () => {
+// type ActionsType =
+//     | ReturnType<typeof getUsersAC>
+//     | ReturnType<typeof getTodosAC>
+//     | ReturnType<typeof setLoadingAC>
+//     | ReturnType<typeof setError>
 //
-//     const [todo, setTodo] = useState<TodoType | null>(null)
-//     const [error, setError] = useState<string>('')
-//
-//     useEffect(() => {
-//         const todoId = "637cb9342f24ad82bcb07d8d"
-//         todosAPI.getTodo(todoId)
-//             .then((res: any) => setTodo(res.data))
-//             .catch(e => {
-//                 setError('Ошибка 😰. Анализируй network 😉')
-//             })
-//     }, [])
+// // Utils functions
+// function baseErrorHandler(dispatch: Dispatch, message: string) {
+//     dispatch(setError(message))
+//     dispatch(setLoadingAC(false))
+// }
 //
 //
+// // Thunk
+// const getTodosTC = (): AppThunk => (dispatch) => {
+//     dispatch(setLoadingAC(true))
+//     api.getTodos()
+//         .then((res) => {
+//             dispatch(getTodosAC(res.data))
+//             dispatch(setLoadingAC(false))
+//         })
+//         .catch((e: AxiosError) => {
+//             // XXX
+//         })
+// }
+//
+// const getUsersTC = (): AppThunk => (dispatch) => {
+//     dispatch(setLoadingAC(true))
+//     api.getUsers()
+//         .then((res) => {
+//             dispatch(getUsersAC(res.data.items))
+//             dispatch(setLoadingAC(false))
+//         })
+//         .catch((e: AxiosError) => {
+//             // XXX
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     app: appReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // COMPONENTS
+// // Loader
+// export const Loader = () => {
 //     return (
-//         <>
-//             <h2>✅ Тудулист</h2>
-//             {
-//                 !!todo
-//                     ? <div>
-//                         <div style={todo?.completed ? {color: 'grey'} : {}} key={todo?.id}>
-//                             <input type="checkbox" checked={todo?.completed}/>
-//                             <b>Описание</b>: {todo?.title}
-//                         </div>
-//                         <h2>Так держать. Ты справился 🚀</h2>
-//                     </div>
-//                     : <h2 style={{ color: 'red' }}>{error}</h2>
-//             }
-//         </>
+//         <h1>Loading ...</h1>
 //     )
 // }
 //
 //
-// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
-//
-// // 📜 Описание:
-// // Студент по неопытности допустил одну маленькую ошибку, но из-за нее он не может вывести на экран тудулист.
-// // Найдите ошибку и вставьте исправленную версию строки кода в качестве ответа
-// // P.S. Эта ошибка из реальной жизни, студенты часто ошибаются подобным образом и не могут понять в чем дело.
-//
-// // 🖥 Пример ответа:  .then((res: any) => setTodo(res.data.data)) ////// return instance.get<TodoType>(`todos/${todoId}`) ПРОБЕЛ!!!!!!
-
-
-
-//======================= Q8 ==================
-
-
-// import axios from 'axios'
-// import React, { useEffect, useState } from 'react'
-// import ReactDOM from 'react-dom/client';
-//
-// // TYPES
-// type ProductType = {
-//     id: string
-//     title: string
-//     description: string
-//     price: number
-// }
-//
-// type FilmType = {
-//     id: number
-//     nameOriginal: string
-//     description: string
-//     ratingImdb: number
-// }
-//
-// // type ProductsResponseType = {
-// //     total: number
-// //     messages: string[]
-// //     page: number
-// //     pageCount: number
-// //     data: ProductType[]
-// // }
-// //
-// // type FilmsResponseType = {
-// //     total: number
-// //     messages: string[]
-// //     page: number
-// //     pageCount: number
-// //     data: FilmType[]
-// // }
-//
-// type CommonResponseType<T> = {
-//     total: number
-//     messages: string[]
-//     page: number
-//     pageCount: number
-//     data: T[]
-// }
-//
-// // Api
-// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
-//
-// const api = {
-//     getProducts() {
-//         return instance.get<CommonResponseType<ProductType>>('products')
-//     },
-//     getFilms() {
-//         return instance.get<CommonResponseType<FilmType>>('films')
-//     }
-// }
-//
-//
-// // Appa
 // const Appa = () => {
 //     return (
 //         <>
-//             <h1>🛒 Products && 🎦 Films</h1>
-//             <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
-//                 <Products/>
-//                 <Films/>
+//             <h1>✅Todos & 🙂Users</h1>
+//             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+//                 <Todos/>
+//                 <Users/>
 //             </div>
 //         </>
 //     )
 // }
 //
-// const Products = () => {
-//
-//     const [products, setProducts] = useState<ProductType[]>([])
+// const Todos = () => {
+//     const dispatch = useAppDispatch()
+//     const todos = useAppSelector(state => state.app.todos)
+//     const error = useAppSelector(state => state.app.error)
+//     const isLoading = useAppSelector(state => state.app.isLoading)
 //
 //     useEffect(() => {
-//         api.getProducts()
-//             .then((res) => setProducts(res.data.data))
+//         dispatch(getTodosTC())
 //     }, [])
 //
 //     return (
-//         <div style={{width: '45%'}}>
-//             <h2>🛒 Products</h2>
-//             <div>
-//                 {
-//                     products.map(p => {
-//                         return (
-//                             <div key={p.id}>
-//                                 <b>{p.title}</b>
-//                                 <p>{p.description}</p>
-//                                 <p>💵 {p.price} $</p>
-//                             </div>
-//                         )
-//                     })
-//                 }</div>
+//         <div>
+//             <h2>✅ Список тудулистов</h2>
+//             {!!error && <h2 style={{color: 'red'}}>{error}</h2>}
+//             {isLoading && <Loader/>}
+//             {
+//                 todos.map((t) => {
+//                     return (
+//                         <div style={t.completed ? {color: 'grey'} : {}} key={t.id}>
+//                             <input type="checkbox" checked={t.completed}/>
+//                             <b>Описание</b>: {t.title}
+//                         </div>
+//                     )
+//                 })
+//             }
 //         </div>
 //     )
 // }
 //
-// const Films = () => {
-//
-//     const [films, setFilms] = useState<FilmType[]>([])
+// const Users = () => {
+//     const dispatch = useAppDispatch()
+//     const users = useAppSelector(state => state.app.users)
+//     const error = useAppSelector(state => state.app.error)
+//     const isLoading = useAppSelector(state => state.app.isLoading)
 //
 //     useEffect(() => {
-//         api.getFilms()
-//             .then((res) => setFilms(res.data.data))
+//         dispatch(getUsersTC())
 //     }, [])
 //
 //     return (
-//         <div style={{width: '45%'}}>
-//             <h2>🎦 Films</h2>
+//         <div>
+//             <h2>🙂 Список юзеров</h2>
+//             {!!error && <h2 style={{color: 'red'}}>{error}</h2>}
+//             {isLoading && <Loader/>}
 //             <div>
 //                 {
-//                     films.map(f => {
+//                     users.map(u => {
 //                         return (
-//                             <div key={f.id}>
-//                                 <b>{f.nameOriginal}</b>
-//                                 <p>{f.description}</p>
-//                                 <p>⭐ {f.ratingImdb} </p>
+//                             <div key={u.id}>
+//                                 <b>name</b>:{u.name} - <b>age</b>:{u.age}
 //                             </div>
 //                         )
 //                     })
@@ -680,28 +1851,240 @@
 //
 //
 // const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-// root.render(<Appa/>)
+// root.render(<Provider store={store}> <Appa/></Provider>)
+//
 //
 // // 📜 Описание:
-// // При запуске проекта на экране вы увидите 2 списка: Products и Films.
-// // С ними все хорошо, но обратите внимание на типизацию ответов с сервера ProductsResponseType и FilmsResponseType.
-// // Дублирование типов на лицо.
-// // Ваша задача написать дженериковый тип CommonResponseType и заменить им дублирующие типы.
-// // Очередность свойств в типах менять запрещено (по причине что нам будет тяжело перебрать все правильные варианты :) )
-// // Параметр тип назовите буквой T
-// //
-// // В качестве ответа нужно скопировать полностью рабочий дженериковый тип CommonResponseType
-// //
-// // 🖥 Пример ответа:
-// // type CommonResponseType = {
-// //   total: T
-// //   messages: T[]
-// //   page: T
-// //   pageCount: T
-// //   data: T[]
-// // }
+// // Перед вами список тудулистов и пользователей, которые находятся в постоянной загрузке.
+// // Откройте network и вы увидите что запросы падают с ошибками,
+// // но в коде этот никак не обрабатывается.
+// // Для обработки ошибок написана утилитная функция baseErrorHandler.
+// // Ваша задача воспользоваться этой функцией и вывести ошибки на экран.
+// // Что нужно написать вместо XXX, чтобы ошибки обработались и пользователь их увидел ?
+// //❗ Код фиксить не нужно.
+//
+// // 🖥 Пример ответа: dispatch(setLoadingAC(false))
+
+
+
+
+// import React, { useEffect } from 'react'
+// import ReactDOM from 'react-dom/client';
+// import { applyMiddleware, combineReducers, legacy_createStore as createStore, Dispatch } from 'redux'
+// import thunk, { ThunkAction, ThunkDispatch } from 'redux-thunk'
+// import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+// import axios, { AxiosError } from 'axios'
+//
+// // TYPES
+// type TodoType = {
+//     id: string;
+//     title: string;
+//     order: number;
+//     createdAt: string;
+//     updatedAt: string;
+//     completed: boolean;
+// }
+//
+// type UserType = {
+//     id: string;
+//     name: string;
+//     age: number;
+// }
+//
+// type UsersResponseType = {
+//     items: UserType[]
+//     totalCount: number
+// }
+//
+//
+// // API
+// const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+//
+// const api = {
+//     getTodos() {
+//         return instance.get<TodoType[]>('todos')
+//     },
+//     getUsers() {
+//         return instance.get<UsersResponseType>('users')
+//     },
+// }
+//
+//
+// // Reducer
+// const initState = {
+//     isLoading: false,
+//     error: null as string | null,
+//     todos: [] as TodoType[],
+//     users: [] as UserType[],
+// }
+//
+// type InitStateType = typeof initState
+//
+// const appReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
+//     switch (action.type) {
+//         case 'APP/GET-TODOS':
+//             return {...state, todos: action.todos}
+//         case 'APP/GET-USERS':
+//             return {...state, users: action.users}
+//         case 'APP/IS-LOADING':
+//             return {...state, isLoading: action.isLoading}
+//         case 'APP/SET-ERROR':
+//             return {...state, error: action.error}
+//         default:
+//             return state
+//     }
+// }
+//
+// const getUsersAC = (users: UserType[]) => ({type: 'APP/GET-USERS', users} as const)
+// const getTodosAC = (todos: TodoType[]) => ({type: 'APP/GET-TODOS', todos} as const)
+// const setLoadingAC = (isLoading: boolean) => ({type: 'APP/IS-LOADING', isLoading} as const)
+// const setError = (error: string | null) => ({type: 'APP/SET-ERROR', error} as const)
+//
+// type ActionsType =
+//     | ReturnType<typeof getUsersAC>
+//     | ReturnType<typeof getTodosAC>
+//     | ReturnType<typeof setLoadingAC>
+//     | ReturnType<typeof setError>
+//
+//
+// // Utils functions
+// function baseSuccessHandler<T>(dispatch: Dispatch, actionCreator: Function, data: T) {
+//     dispatch(actionCreator(data))
+//     dispatch(setLoadingAC(false))
+// }
+//
+// // Thunk
+// const getTodosTC = (): AppThunk => (dispatch) => {
+//     dispatch(setLoadingAC(true))
+//     api.getTodos()
+//         .then((res) => {
+//             // XXX
+//             baseSuccessHandler(dispatch, getTodosAC, res.data)
+//         })
+//         .catch((e: AxiosError) => {
+//             dispatch(setError(e.message))
+//             dispatch(setLoadingAC(false))
+//         })
+// }
+//
+// const getUsersTC = (): AppThunk => (dispatch) => {
+//     dispatch(setLoadingAC(true))
+//     api.getUsers()
+//         .then((res) => {
+//             // YYY
+//             baseSuccessHandler(dispatch,getUsersAC,res.data.items)
+//         })
+//         .catch((e: AxiosError) => {
+//             dispatch(setError(e.message))
+//             dispatch(setLoadingAC(false))
+//         })
+// }
+//
+// // Store
+// const rootReducer = combineReducers({
+//     app: appReducer,
+// })
+//
+// const store = createStore(rootReducer, applyMiddleware(thunk))
+// type RootState = ReturnType<typeof store.getState>
+// type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>
+// type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>
+// const useAppDispatch = () => useDispatch<AppDispatch>()
+// const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+//
+//
+// // COMPONENTS
+// // Loader
+// export const Loader = () => {
+//     return (
+//         <h1>Loading ...</h1>
+//     )
+// }
+//
+// const App = () => {
+//     return (
+//         <>
+//             <h1>✅Todos & 🙂Users</h1>
+//             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+//                 <Todos/>
+//                 <Users/>
+//             </div>
+//         </>
+//     )
+// }
+//
+// const Todos = () => {
+//     const dispatch = useAppDispatch()
+//     const todos = useAppSelector(state => state.app.todos)
+//     const error = useAppSelector(state => state.app.error)
+//     const isLoading = useAppSelector(state => state.app.isLoading)
+//
+//     useEffect(() => {
+//         dispatch(getTodosTC())
+//     }, [])
+//
+//     return (
+//         <div>
+//             <h2>✅ Список тудулистов</h2>
+//             {!!error && <h2 style={{color: 'red'}}>{error}</h2>}
+//             {isLoading && <Loader/>}
+//             {
+//                 todos.map((t) => {
+//                     return (
+//                         <div style={t.completed ? {color: 'grey'} : {}} key={t.id}>
+//                             <input type="checkbox" checked={t.completed}/>
+//                             <b>Описание</b>: {t.title}
+//                         </div>
+//                     )
+//                 })
+//             }
+//         </div>
+//     )
+// }
+//
+// const Users = () => {
+//     const dispatch = useAppDispatch()
+//     const users = useAppSelector(state => state.app.users)
+//     const error = useAppSelector(state => state.app.error)
+//     const isLoading = useAppSelector(state => state.app.isLoading)
+//
+//     useEffect(() => {
+//         dispatch(getUsersTC())
+//     }, [])
+//
+//     return (
+//         <div>
+//             <h2>🙂 Список юзеров</h2>
+//             {!!error && <h2 style={{color: 'red'}}>{error}</h2>}
+//             {isLoading && <Loader/>}
+//             <div>
+//                 {
+//                     users.map(u => {
+//                         return (
+//                             <div key={u.id}>
+//                                 <b>name</b>:{u.name} - <b>age</b>:{u.age}
+//                             </div>
+//                         )
+//                     })
+//                 }</div>
+//         </div>
+//     )
+// }
+//
+// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// root.render(<Provider store={store}> <App/></Provider>)
+//
+//
+// // 📜 Описание:
+// // Перед вами список тудулистов и пользователей, которые находятся в постоянной загрузке.
+// // Откройте network и вы увидите что запросы на сервер уходят и возвращаются с хорошими данными,
+// // но вместо этого пользователь видит на экране Loader.
+// // Для обработки успешного результата написана утилитная функция baseSuccessHandler.
+// // Ваша задача воспользоваться этой функцией отобразить Todos и Users
+// // Что нужно написать вместо XXX и YYY, чтобы реализовать данную задачу?
+// // Ответ дайте через пробел.
+//
+// // 🖥 Пример ответа: dispatch(baseSuccessHandler(1,2,3))  dispatch(baseSuccessHandler(3,2,1)
+
 
 export {}
-
-
-
